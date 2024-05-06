@@ -9,9 +9,9 @@ on:
     branches:
       - master
 
-# defaults:
-#   run:
-#     working-directory: /home/runner/work/Hello_World/Hello_World/
+defaults:
+  run:
+    working-directory: /home/runner/work/Hello_World_v1/Hello_World_v1
 
 jobs:
   build:

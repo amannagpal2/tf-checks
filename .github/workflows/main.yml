@@ -29,7 +29,8 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
-
+      - name: Location
+        run: pwd
       - name: Docker login
         uses: docker/login-action@v2
         with:

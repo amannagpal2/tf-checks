@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: helloworld
-        image: aman42988/helloworldv1:latest
+        image: contregistrypractice.azurecr.io/hello:latest
         ports:
         - containerPort: 8080
-    # imagePullSecrets:
-    # - name: acr-secrets
+    imagePullSecrets:
+    - name: acr-secrets

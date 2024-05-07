@@ -43,12 +43,12 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker build . -t contregistrypractice.azurecr.io/hello:${{ github.sha }}
-          docker push contregistrypractice.azurecr.io/hello:${{ github.sha }}
+          docker build . -t contregistrypractice.azurecr.io/hello:latest
+          docker push contregistrypractice.azurecr.io/hello:latest
       - name: Image Scan
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'contregistrypractice.azurecr.io/hello:${{ github.sha }}'
+          image-ref: 'contregistrypractice.azurecr.io/hello:latest'
           security-checks: 'vuln,secret,config'
           format: 'sarif'
           output: 'trivy-image-results.sarif'

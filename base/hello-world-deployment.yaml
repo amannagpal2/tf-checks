@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: helloworld
-        image: contregistrypractice.azurecr.io/hello:${{ github.sha }}
+        image: contregistrypractice.azurecr.io/hello:latest
         ports:
         - containerPort: 8080
     imagePullSecrets:

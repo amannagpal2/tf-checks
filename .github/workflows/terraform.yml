@@ -1,70 +1,58 @@
 name: Create resources using Terraform
- 
+
 on:
   push:
-    branches: 
+    branches:
       - master
-      
-     
+
 jobs:
-
-  tflint-checks:
+  terraform-checks:
     runs-on: ubuntu-latest
-    steps:
-    
-    # Checkout Repository
-    - name : Check out Git Repository
-      uses: actions/checkout@v3  
-      
-    # TFLint - Terraform Check
-    - uses: actions/cache@v2
-      name: Cache plugin dir
-      with:
-        path: ~/.tflint.d/plugins
-        key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
 
-    - uses: terraform-linters/setup-tflint@v2
-      name: Setup TFLint
-      with:
-        github_token: ${{ secrets.CI_GITHUB_TOKEN }}
-        
-    # Print TFLint version
-    - name: Show version
-      run: tflint --version
-      
-    # Install plugins
-    - name: Init TFLint
-      run: tflint --init
-      
-    # Run tflint command in each directory recursively
-    - name: Run TFLint
-      run: tflint -f compact --recursive --force
-      
-   #new
-  tfsec-checks:
-      runs-on: ubuntu-latest
-      needs: tflint-checks
-      
-      steps:
+    steps:
       # Checkout Repository
-      - name : Check out Git Repository
-        uses: actions/checkout@v2
-      
-      # Tfsec - Security scanner for your Terraform code
+      - name: Check out Git Repository
+        uses: actions/checkout@v3
+
+      # Cache TFLint plugins directory
+      - name: Cache plugin dir
+        uses: actions/cache@v2
+        with:
+          path: ~/.tflint.d/plugins
+          key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+
+      # Setup TFLint
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v2
+        with:
+          github_token: ${{ secrets.CI_GITHUB_TOKEN }}
+
+      # Print TFLint version
+      - name: Show TFLint version
+        run: tflint --version
+
+      # Install TFLint plugins
+      - name: Init TFLint
+        run: tflint --init
+
+      # Run TFLint
+      - name: Run TFLint
+        run: tflint -f compact --recursive --force
+
+      # Run Tfsec
       - name: Run Tfsec
         uses: aquasecurity/tfsec-action@v1.0.0
-  chekov-check:
-    name: checkov
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.8
-    - name: Test with Checkov
-      id: checkov
-      uses: bridgecrewio/checkov-action@master
-      with:
-        directory: ./Terraform_code
-        framework: terraform
+
+      # Set up Python 3.8 for Checkov
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      # Test with Checkov
+      - name: Test with Checkov
+        id: checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: ./Terraform_code
+          framework: terraform

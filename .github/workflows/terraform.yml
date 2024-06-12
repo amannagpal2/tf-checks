@@ -44,10 +44,10 @@ jobs:
         uses: aquasecurity/tfsec-action@v1.0.0
 
       # Set up Python 3.8 for Checkov
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
+      # - name: Set up Python 3.8
+      #   uses: actions/setup-python@v1
+      #   with:
+      #     python-version: 3.8
 
       # Test with Checkov
       - name: Test with Checkov

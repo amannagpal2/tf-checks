@@ -63,6 +63,23 @@ jobs:
       - name: Run Tfsec
         uses: aquasecurity/tfsec-action@v1.0.0
 
+
+      - name: Save TFSec Output
+        run: echo "${{ steps.tfsec.outputs.tfsec_results }}" > tfsec.txt
+
+      # Filter failure cases from TFSec output
+      - name: Filter Failure Cases from TFSec Output
+        run: grep -E "CRITICAL|HIGH" tfsec.txt > tfsec-failures.txt || true
+
+      # Comment on PR with TFSec failure cases
+      - name: Comment on PR with TFSec Failure Cases
+        if: always()
+        run: |
+          if [ -s tfsec-failures.txt ]; then
+            cat tfsec-failures.txt
+          else
+            echo "No TFSec failure cases found."
+          fi
         
       - name: Format Terraform files
         run: terraform fmt -recursive

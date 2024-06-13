@@ -46,6 +46,10 @@ jobs:
       - name: Run Tfsec
         uses: aquasecurity/tfsec-action@v1.0.0
 
+        
+      - name: Format Terraform files
+        run: terraform fmt -recursive
+        
       # Test with Checkov
       - name: Test with Checkov
         id: checkov

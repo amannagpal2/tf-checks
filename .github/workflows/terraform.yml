@@ -56,30 +56,26 @@ jobs:
           framework: terraform
         continue-on-error: true
 
-  post-comment:
-    runs-on: ubuntu-latest
-    needs: terraform-checks
-    steps:
-      - name: Get Terraform Checks Output
-        id: terraform-output
-        run: echo "::set-output name=terraform-output::$(cat ${{ github.workspace }}/terraform-output.txt)"
+      # Checkov Scan
+      - name: Checkov Scan
+        id: checkov_scan
+        run: |
+          mkdir reports
+          checkov -d . --skip-path ./.github --skip-path ./test -s -o cli -o junitxml --output-file-path ./reports
 
-      - name: Comment on PR
-        uses: actions/github-script@v4
+      - name: Display Checkov Scan Report in Workflow
+        id: checkov-scan-report
+        uses: dorny/test-reporter@v1
+        if: ${{ steps.checkov_scan.outcome == 'success' }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = process.env['terraform-output'];
-            const context = github.context;
-            const message = `
-            **Terraform Checks Output:**
-            \`\`\`
-            ${output}
-            \`\`\`
-            `;
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: message
-            });
+          fail-on-error: false
+          name: Checkov Scan Report
+          path: ./reports/results_junitxml.xml
+          reporter: java-junit
+
+      - name: Publish Checkov Scan Report in PR
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          junit_files: ./reports/results_junitxml.xml
+          check_name: Checkov Scan Report
+          fail_on: nothing

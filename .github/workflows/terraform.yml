@@ -37,7 +37,7 @@ jobs:
       # Install TFLint plugins
       - name: Init TFLint
         run: tflint --init
-
+#
       # # Run TFLint
       # - name: Run TFLint
       #   run: tflint -f compact --recursive --force

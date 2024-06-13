@@ -39,16 +39,16 @@ resource "azurerm_network_interface" "myvmnic" {
     #public_ip_address_id = azurerm_public_ip.mypublicip.id 
   }
 }
-# resource "azurerm_network_security_rule" "example_rule" {
-#     name                        = "example-security-rule"
-#     resource_group_name         = azurerm_resource_group.myrg.name  # Specify the resource group name
-#     network_security_group_name = azurerm_network_security_group.example_group.name  # Specify the network security group name
-#     direction                   = "Inbound"
-#     access                      = "Allow"
-#     protocol                    = "TCP"  # Specify the protocol
-#     source_port_range           = "*"
-#     destination_port_range      = "22"
-#     source_address_prefix       = "*"
-#     destination_address_prefix = "0.0.0.0/0"
-#     priority                    = 100  # Specify a priority value
-# }
+resource "azurerm_network_security_rule" "example_rule" {
+     name                        = "example-security-rule"
+     resource_group_name         = azurerm_resource_group.myrg.name  # Specify the resource group name
+     network_security_group_name = azurerm_network_security_group.example_group.name  # Specify the network security group name
+     direction                   = "Inbound"
+     access                      = "Allow"
+     protocol                    = "TCP"  # Specify the protocol
+     source_port_range           = "*"
+     destination_port_range      = "22"
+     source_address_prefix       = "*"
+     destination_address_prefix = "0.0.0.0/0"
+     priority                    = 100  # Specify a priority value
+ }

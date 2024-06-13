@@ -63,7 +63,7 @@ jobs:
         with:
          directory: ./Terraform_code
          framework: terraform
-         output_format: junitxml
-         output_file: ./reports/checkov_results.xml
+         output_format: json
+         output_file: ./reports/checkov_results.json
          continue-on-error: true
 

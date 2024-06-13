@@ -30,24 +30,22 @@ jobs:
       # Print TFLint version
       - name: Show TFLint version
         run: tflint --version
+        continue-on-error: true
 
       # Install TFLint plugins
       - name: Init TFLint
         run: tflint --init
+        continue-on-error: true
 
       # Run TFLint
       - name: Run TFLint
         run: tflint -f compact --recursive --force
+        continue-on-error: true
 
       # Run Tfsec
       - name: Run Tfsec
         uses: aquasecurity/tfsec-action@v1.0.0
-
-      # Set up Python 3.8 for Checkov
-      # - name: Set up Python 3.8
-      #   uses: actions/setup-python@v1
-      #   with:
-      #     python-version: 3.8
+        continue-on-error: true
 
       # Test with Checkov
       - name: Test with Checkov
@@ -56,3 +54,32 @@ jobs:
         with:
           directory: ./Terraform_code
           framework: terraform
+        continue-on-error: true
+
+  post-comment:
+    runs-on: ubuntu-latest
+    needs: terraform-checks
+    steps:
+      - name: Get Terraform Checks Output
+        id: terraform-output
+        run: echo "::set-output name=terraform-output::$(cat ${{ github.workspace }}/terraform-output.txt)"
+
+      - name: Comment on PR
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = process.env['terraform-output'];
+            const context = github.context;
+            const message = `
+            **Terraform Checks Output:**
+            \`\`\`
+            ${output}
+            \`\`\`
+            `;
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });

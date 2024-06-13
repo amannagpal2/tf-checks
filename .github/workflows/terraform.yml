@@ -48,34 +48,22 @@ jobs:
         continue-on-error: true
 
       # Test with Checkov
-      - name: Test with Checkov
+      # - name: Test with Checkov
+      #   id: checkov
+      #   uses: bridgecrewio/checkov-action@master
+      #   with:
+      #     directory: ./Terraform_code
+      #     framework: terraform
+      #   continue-on-error: true
+
+      # Checkov Scan
+      - name: Test with Checkov and Save Output
         id: checkov
         uses: bridgecrewio/checkov-action@master
         with:
-          directory: ./Terraform_code
-          framework: terraform
-        continue-on-error: true
+         directory: ./Terraform_code
+         framework: terraform
+         output_format: junitxml
+         output_file: ./reports/checkov_results.xml
+         continue-on-error: true
 
-      # Checkov Scan
-      - name: Checkov Scan
-        id: checkov_scan
-        run: |
-          mkdir reports
-          checkov -d . --skip-path ./.github --skip-path ./test -s -o cli -o junitxml --output-file-path ./reports
-
-      - name: Display Checkov Scan Report in Workflow
-        id: checkov-scan-report
-        uses: dorny/test-reporter@v1
-        if: ${{ steps.checkov_scan.outcome == 'success' }}
-        with:
-          fail-on-error: false
-          name: Checkov Scan Report
-          path: ./reports/results_junitxml.xml
-          reporter: java-junit
-
-      - name: Publish Checkov Scan Report in PR
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          junit_files: ./reports/results_junitxml.xml
-          check_name: Checkov Scan Report
-          fail_on: nothing

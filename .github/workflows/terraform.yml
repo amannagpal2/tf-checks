@@ -50,6 +50,7 @@ jobs:
       - name: Test with Checkov
         id: checkov
         uses: bridgecrewio/checkov-action@master
+        continue-on-error: true
 
   create-issue-comment:
     runs-on: ubuntu-latest

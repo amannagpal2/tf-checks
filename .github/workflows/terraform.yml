@@ -38,9 +38,26 @@ jobs:
       - name: Init TFLint
         run: tflint --init
 
-      # Run TFLint
-      - name: Run TFLint
-        run: tflint -f compact --recursive --force
+      # # Run TFLint
+      # - name: Run TFLint
+      #   run: tflint -f compact --recursive --force
+      - name: run tflint
+        id: tflint
+        run: |
+          tflint -f compact --recursive --force 2>&1 | tee tflint-out.txt
+          if [ ! -s tflint-out.txt ]; then
+            echo "TFLint run has no findings" >> tflint-out.txt
+          else
+            sed -i '1i*************' tflint-out.txt
+            sed -i '1iTFLint Report' tflint-out.txt
+          fi
+      - name: TFLint Output in PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          header: tflint-outputs
+          recreate: true
+          path: tflint-out.txt
 
       # Run Tfsec
       - name: Run Tfsec

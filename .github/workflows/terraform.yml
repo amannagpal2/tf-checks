@@ -54,7 +54,7 @@ jobs:
       - name: TFLint Output in PR
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
           header: tflint-outputs
           recreate: true
           path: tflint-out.txt
@@ -73,20 +73,4 @@ jobs:
         uses: bridgecrewio/checkov-action@master
         continue-on-error: true
 
-  create-issue-comment:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
-
-    steps:
-      # Checkout Repository
-      - name: Check out Git Repository
-        uses: actions/checkout@v3
-
-      # Create Issue Comment
-      - name: Create Issue Comment
-        run: |
-          curl -X POST \
-          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -H "Accept: application/vnd.github.v3+json" \
-          https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments \
-          -d '{"body":"Security issues are there"}'
+  

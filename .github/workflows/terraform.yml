@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   terraform-checks:
@@ -30,64 +33,38 @@ jobs:
       # Print TFLint version
       - name: Show TFLint version
         run: tflint --version
-        continue-on-error: true
 
       # Install TFLint plugins
       - name: Init TFLint
         run: tflint --init
-        continue-on-error: true
 
       # Run TFLint
       - name: Run TFLint
-        run: |
-          tflint --format=json | tee tflint_output.json
-        continue-on-error: true
-
-      - name: Get TFLint Output
-        id: get-tflint-output
-        run: echo "::set-output name=tflint-output::$(cat tflint_output.json)"
-
-      - name: Comment on PR
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = process.env['tflint-output'];
-            const message = `
-            **TFLint Output:**
-            \`\`\`
-            ${output}
-            \`\`\`
-            `;
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: message
-            });
+        run: tflint -f compact --recursive --force
 
       # Run Tfsec
       - name: Run Tfsec
         uses: aquasecurity/tfsec-action@v1.0.0
-        continue-on-error: true
 
       # Test with Checkov
-      # - name: Test with Checkov
-      #   id: checkov
-      #   uses: bridgecrewio/checkov-action@master
-      #   with:
-      #     directory: ./Terraform_code
-      #     framework: terraform
-      #   continue-on-error: true
-
-      # Checkov Scan
-      - name: Test with Checkov and Save Output
+      - name: Test with Checkov
         id: checkov
         uses: bridgecrewio/checkov-action@master
-        with:
-         directory: ./Terraform_code
-         framework: terraform
-         output_format: json
-         output_file: ./reports/checkov_results.json
-         continue-on-error: true
 
+  create-issue-comment:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+
+    steps:
+      # Checkout Repository
+      - name: Check out Git Repository
+        uses: actions/checkout@v3
+
+      # Create Issue Comment
+      - name: Create Issue Comment
+        run: |
+          curl -X POST \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments \
+          -d '{"body":"Security issues are there"}'

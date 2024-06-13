@@ -73,14 +73,14 @@ jobs:
         run: grep -E "CRITICAL|HIGH" tfsec.txt > tfsec-failures.txt || true
 
       # Comment on PR with TFSec failure cases
-      - name: Comment on PR with TFSec Failure Cases
-        if: always()
-        run: |
-          if [ -s tfsec-failures.txt ]; then
-            cat tfsec-failures.txt
-          else
-            echo "No TFSec failure cases found."
-          fi
+      - name: TFSec Output in PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+          header: tfsec-outputs
+          recreate: true
+          path: tfsec-failures.txt
+
         
       - name: Format Terraform files
         run: terraform fmt -recursive

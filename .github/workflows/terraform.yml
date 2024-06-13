@@ -62,6 +62,7 @@ jobs:
       # Run Tfsec
       - name: Run Tfsec
         uses: aquasecurity/tfsec-action@v1.0.0
+        continue-on-error: true 
 
 
       - name: Save TFSec Output

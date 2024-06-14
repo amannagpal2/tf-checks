@@ -60,13 +60,13 @@ jobs:
           path: tflint-out.txt
 
       # Run Tfsec
-      - name: Run Tfsec
-        uses: aquasecurity/tfsec-action@v1.0.0
-        continue-on-error: true 
+      - name: Run TFSec and save output
+        run: aquasecurity/tfsec-action@v1.0.0 | tee tfsec.txt
+        continue-on-error: true
 
 
-      - name: Save TFSec Output
-        run: echo "${{ steps.tfsec.outputs.tfsec_results }}" > tfsec.txt
+      # - name: Save TFSec Output
+      #   run: echo "${{ steps.tfsec.outputs.tfsec_results }}" > tfsec.txt
 
       # Filter failure cases from TFSec output
       - name: Filter Failure Cases from TFSec Output

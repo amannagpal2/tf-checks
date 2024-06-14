@@ -9,39 +9,31 @@ on:
       - master
 
 jobs:
-  terraform-checks:
+  tflint-check:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout Repository
       - name: Check out Git Repository
         uses: actions/checkout@v3
 
-      # Cache TFLint plugins directory
       - name: Cache plugin dir
         uses: actions/cache@v2
         with:
           path: ~/.tflint.d/plugins
           key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
 
-      # Setup TFLint
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v2
         with:
           github_token: ${{ secrets.CI_GITHUB_TOKEN }}
 
-      # Print TFLint version
       - name: Show TFLint version
         run: tflint --version
 
-      # Install TFLint plugins
       - name: Init TFLint
         run: tflint --init
-#
-      # # Run TFLint
-      # - name: Run TFLint
-      #   run: tflint -f compact --recursive --force
-      - name: run tflint
+
+      - name: Run TFLint
         id: tflint
         run: |
           tflint -f compact --recursive --force 2>&1 | tee tflint-out.txt
@@ -51,6 +43,7 @@ jobs:
             sed -i '1i*************' tflint-out.txt
             sed -i '1iTFLint Report' tflint-out.txt
           fi
+
       - name: TFLint Output in PR
         uses: marocchino/sticky-pull-request-comment@v2
         with:
@@ -59,18 +52,35 @@ jobs:
           recreate: true
           path: tflint-out.txt
 
-      # Run Tfsec
+  tfsec-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git Repository
+        uses: actions/checkout@v3
+
       - name: Run Tfsec
         uses: aquasecurity/tfsec-action@v1.0.0
 
-        
-      - name: Format Terraform files
-        run: terraform fmt -recursive
-        
-      # Test with Checkov
+  checkov-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git Repository
+        uses: actions/checkout@v3
+
       - name: Test with Checkov
         id: checkov
         uses: bridgecrewio/checkov-action@master
-        continue-on-error: true
+        with:
+         directory: ./Terraform_code
+        
+  format-terraform:
+    runs-on: ubuntu-latest
 
-  
+    steps:
+      - name: Check out Git Repository
+        uses: actions/checkout@v3
+
+      - name: Format Terraform files
+        run: terraform fmt -recursive

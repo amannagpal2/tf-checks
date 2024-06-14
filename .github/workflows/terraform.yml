@@ -61,8 +61,11 @@ jobs:
 
       # Run Tfsec
       - name: Run TFSec and save output
-        run: aquasecurity/tfsec-action@v1.0.0 | tee tfsec.txt
+        id: tfsec
+        run: |
+          aquasecurity/tfsec-action@v1.0.0 > tfsec.txt 2>&1 || true
         continue-on-error: true
+     
 
 
       # - name: Save TFSec Output

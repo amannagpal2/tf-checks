@@ -62,18 +62,6 @@ jobs:
       - name: Run Tfsec
         uses: aquasecurity/tfsec-action@v1.0.0
 
-
-      # - name: Filter Failure Cases from TFSec Output
-      #   run: grep -E "CRITICAL|HIGH" tfsec_output.sarif.txt > tfsec-failures.txt || true
-
-      # - name: TFSec Output in PR
-      #   uses: marocchino/sticky-pull-request-comment@v2
-      #   with:
-      #     GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
-      #     header: tfsec-outputs
-      #     recreate: true
-      #     path: tfsec-failures.txt
-
   checkov-check:
     runs-on: ubuntu-latest
 
@@ -84,19 +72,7 @@ jobs:
       - name: Test with Checkov
         id: checkov
         uses: bridgecrewio/checkov-action@master
-        # continue-on-error: true
-
-      # - name: Checkov Output in PR
-      #   uses: marocchino/sticky-pull-request-comment@v2
-      #   with:
-      #     GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
-      #     header: checkov-outputs
-      #     recreate: true
-      #     message: |
-      #       ```
-      #       ${{ steps.checkov.outputs.checkov_output }}
-      #       ```
-
+        
   format-terraform:
     runs-on: ubuntu-latest
 

@@ -72,6 +72,8 @@ jobs:
       - name: Test with Checkov
         id: checkov
         uses: bridgecrewio/checkov-action@master
+        with:
+         directory: ./Terraform_code
         
   format-terraform:
     runs-on: ubuntu-latest

@@ -63,7 +63,7 @@ jobs:
       - name: Run TFSec and save output
         id: tfsec
         run: |
-          aquasecurity/tfsec-action@v1.0.0 > tfsec.txt 2>&1 || true
+          tfsec --format sarif ./Terraform_code > tfsec_output.sarif.txt 2>&1 || true
         continue-on-error: true
      
 
@@ -73,7 +73,7 @@ jobs:
 
       # Filter failure cases from TFSec output
       - name: Filter Failure Cases from TFSec Output
-        run: grep -E "CRITICAL|HIGH" tfsec.txt > tfsec-failures.txt || true
+        run: grep -E "CRITICAL|HIGH" tfsec_output.sarif.txt > tfsec-failures.txt || true
 
       # Comment on PR with TFSec failure cases
       - name: TFSec Output in PR
@@ -82,7 +82,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
           header: tfsec-outputs
           recreate: true
-          path: tfsec.txt
+          path: tfsec_output.sarif.txt
 
         
       - name: Format Terraform files
@@ -93,5 +93,3 @@ jobs:
         id: checkov
         uses: bridgecrewio/checkov-action@master
         continue-on-error: true
-
-  

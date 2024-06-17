@@ -7,15 +7,14 @@ terraform {
       version = ">= 2.0" 
     }
     random = {
-      source = "hashicorp/random"
+ source = "hashicorp/random"
       version = ">= 3.0"
     }
   }
 }
 
 # Provider Block
-provider "azurerm" {
- features {}          
+provider "azurerm" {features {}          
 }
 
 # Random String Resource
